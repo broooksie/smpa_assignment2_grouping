@@ -61,11 +61,11 @@ Take a moment to look at the various categories included for each disbursement.
 
 Without doing any analysis yet, what are three questions you might try to answer using this dataset? Write your narrative answers in the spaces below.
 
-1.  
+1.  What state did the campaign committee spend the most on? This dataset includes both states and disbursement amounts 
 
-2.  
+2.  What year had the highest disbursement rates? This dataset includes both year and a total number of disbursements, so it'd be interesting to see what year was most focused on.
 
-3.  
+3.  what category did the campaign spend the most on in Virginia? It'd be interesting to see what the committee prioritized close to home!
 
 ## Coding Assignment Questions
 
@@ -81,6 +81,18 @@ How much was spent in the 2017 vs. 2018 reporting year?
 
 ```{r}
 
+payments2017 <-
+  filter(payments, disbursement_year == 2017) %>%
+  group_by(committee_name) %>% 
+  summarise(total_disbursement = sum(disbursement_amount))
+  ##17,082,338
+
+payments2018 <-
+  filter(payments, disbursement_year == 2018) %>%
+  group_by(committee_name) %>% 
+  summarise(total_disbursement = sum(disbursement_amount))
+  ##37,212,716
+  
 
 
 
@@ -93,10 +105,13 @@ Tally the total overall disbursement amounts for each month (distinguishing betw
 
 ```{r}
 
+paymentsmonths <-
+  payments %>% 
+  group_by(committee_name, disbursement_year, disbursement_month) %>% 
+  summarise(monthly_disbursement = sum(disbursement_amount)) 
 
 
-
-
+##October of 2018
 
 ```
 
@@ -104,9 +119,13 @@ Which recipient (recipient_name) was paid the most in the 2020 election cycle?
 
 ```{r}
 
+toprecipient2020 <-
+  filter(payments, election_cycle == 2020) %>% 
+  group_by(recipient_name) %>% 
+  summarise(totaldisbursement = sum(disbursement_amount)) 
 
 
-
+##American Made Media Consultants LLC
 
 
 
@@ -116,8 +135,11 @@ Look at what this recipient was paid for. What service or good (see the "disburs
 
 ```{r}
 
-
-
+mediaconsultants <-
+  filter(payments, recipient_name == "AMERICAN MADE MEDIA CONSULTANTS, LLC", election_cycle == 2020) %>% 
+  group_by(recipient_name, disbursement_description) %>% 
+  summarise(totaldisbursement = sum(disbursement_amount)) 
+##Placed media
 
 
 
@@ -126,9 +148,12 @@ Look at what this recipient was paid for. What service or good (see the "disburs
 What's the most common category overall (see "disbursement_description") the campaign spent money on?
 
 ```{r}
+commoncategory <-
+  payments %>% 
+  group_by(committee_name, disbursement_description) %>% 
+  summarise(totaldisbursement = sum(disbursement_amount))
 
-
-
+##DIGITAL CONSULTING/ONLINE ADVERTISING
 
 
 
@@ -139,10 +164,15 @@ Who were the 5 biggest recipients of campaign spending on "LEGAL CONSULTING"..?
 ```{r}
 
 
+legalconsulting <- 
+  filter(payments, disbursement_description == "LEGAL CONSULTING") %>% 
+  group_by(recipient_name, disbursement_description) %>% 
+  summarise(totaldisbursement = sum(disbursement_amount)) %>% 
+  arrange(desc(totaldisbursement)) %>% 
+  head(5) %>% 
+  view()
 
-
-
-
+##See view
 
 ```
 
@@ -152,7 +182,17 @@ Who are the top 5 individuals (vs. organization) were paid by the campaign commi
 ```{r}
 
 
+top5individual <-
+  payments %>%  
+  filter(payee_last_name != "NA") %>% 
+  group_by(payee_last_name, payee_first_name) %>% 
+  summarise(totaldisbursement = sum(disbursement_amount)) %>%  
+  arrange(desc(totaldisbursement)) %>% 
+  head(5) %>% 
+  view() 
 
+
+##see view
 
 
 
@@ -164,9 +204,14 @@ For the indvidual who was paid the most, which payment category (disbursement_de
 
 ```{r}
 
+glassneramounts <-
+  payments %>% 
+  filter(payee_last_name == "GLASSNER") %>% 
+  group_by(payee_last_name, disbursement_description) %>%
+  summarise(totaldisbursement = sum
+            (disbursement_amount))
 
-
-
+##Payroll, $499,000
 
 
 
